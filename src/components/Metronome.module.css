@@ -1,0 +1,62 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  color: #1a1a1a;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modeLabel {
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.timeSignature {
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.mainDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.bpm {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.lightsContainer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  height: 1.5rem;
+  width: 100%;
+}
+
+.light {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.lightActive {
+  background-color: #000;
+}
