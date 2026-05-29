@@ -1,5 +1,5 @@
-import React from 'react';
-import styles from './Metronome.module.css';
+import React from "react";
+import styles from "./Metronome.module.css";
 
 interface MetronomeProps {
   bpm: number;
@@ -12,18 +12,18 @@ const Metronome: React.FC<MetronomeProps> = ({
   bpm,
   ticks,
   isPlaying,
-  currentBeat
+  currentBeat,
 }) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <span className={styles.modeLabel}>METRONOME</span>
-        <span className={styles.timeSignature}>J={ticks}</span>
-      </div >
+        <span className={styles.timeSignature}>♩={ticks}</span>
+      </div>
 
       <div className={styles.mainDisplay}>
-        <div className={styles.bpm}>{bpm}</div >
-      </div >
+        <div className={styles.bpm}>{bpm}</div>
+      </div>
 
       <div className={styles.lightsContainer} data-testid="lights-container">
         {Array.from({ length: ticks }).map((_, i) => (
@@ -31,14 +31,12 @@ const Metronome: React.FC<MetronomeProps> = ({
             key={i}
             data-testid="metronome-light"
             className={`${styles.light} ${
-              isPlaying && currentBeat === i + 1
-                ? styles.lightActive
-                : ''
+              isPlaying && currentBeat === i + 1 ? styles.lightActive : ""
             }`}
           />
         ))}
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 

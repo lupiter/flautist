@@ -1,31 +1,39 @@
 import { useState } from "react";
 import { useAudio } from "./context/useAudio";
-// import Metronome from "./components/Metronome";
+import Metronome from "./components/Metronome";
 import Tuner from "./components/Tuner";
-// import { useMetronome } from "./hooks/useMetronome";
-import { useTunerIn, useTunerOut, NOTES, type Note, notesToFrequency } from "./hooks/useTuner";
+import { useMetronome } from "./hooks/useMetronome";
+import {
+  useTunerIn,
+  useTunerOut,
+  NOTES,
+  type Note,
+  notesToFrequency,
+} from "./hooks/useTuner";
 import styles from "./App.module.css";
 
 type TunerMode = "off" | "in" | "out";
 
 function App() {
   const { audioContext, resume, isSuspended } = useAudio();
-  // const [metronomeActive, setMetronomeActive] = useState(false);
+  const [metronomeActive, setMetronomeActive] = useState(false);
   const [note, setNote] = useState<Note>("C");
   const [octave, setOctave] = useState(5);
-  // const [bpm, setBpm] = useState(120);
-  // const [ticks, setTicks] = useState(4);
-  const [pitch, setPitch] = useState(440);
+  const [bpm, setBpm] = useState(120);
+  const [ticks, setTicks] = useState(4);
   const [transpose, setTranspose] = useState<Note>("C");
+  const pitch = notesToFrequency(note, octave, transpose);
   const [tunerMode, setTunerMode] = useState("off");
 
-  // const { isPlaying, start, stop, currentBeat } = useMetronome({
-  //   bpm,
-  //   totalBeats: ticks,
-  //   silent: false,
-  // });
+  const { isPlaying, start, stop, currentBeat } = useMetronome({
+    bpm,
+    totalBeats: ticks,
+    silent: false,
+  });
 
   const { play: startTuner, stop: stopTuner } = useTunerOut(pitch);
+
+  const targetMidiNote = 12 * Math.log2(pitch / 440) + 69;
 
   const {
     isListening,
@@ -36,7 +44,7 @@ function App() {
     frequency,
     volume,
   } = useTunerIn({
-    transpose,
+    targetMidiNote,
   });
 
   const handleStartAudio = async () => {
@@ -59,69 +67,57 @@ function App() {
     }
   };
 
-  // const handleTogglePlayMetronome = () => {
-  //   if (isPlaying) {
-  //     stop();
-  //   } else {
-  //     start();
-  //   }
-  // };
+  const handleTogglePlayMetronome = () => {
+    if (isPlaying) {
+      stop();
+    } else {
+      start();
+    }
+  };
 
   // const handleTap = () => {
   //   console.log("TAP pressed");
   // };
 
   const handleNote = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const note = e.target.value as Note;
-    setPitch(notesToFrequency(note, octave, transpose));
-    setNote(note);
+    setNote(e.target.value as Note);
   };
 
   const handleOctave = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const octave = parseInt(e.target.value);
-    setPitch(notesToFrequency(note, octave, transpose));
-    setOctave(octave);
+    setOctave(parseInt(e.target.value));
   };
 
   const handleTranspose = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const transpose = e.target.value as Note;
-    setPitch(notesToFrequency(note, octave, transpose));
-    setTranspose(transpose);
+    setTranspose(e.target.value as Note);
   };
 
-  // const handleTempoUp = () => {
-  //   setBpm((prev) => Math.min(prev + 1, 240));
-  // };
+  const handleTempoUp = () => {
+    setBpm((prev) => Math.min(prev + 1, 240));
+  };
 
-  // const handleTempoDown = () => {
-  //   setBpm((prev) => Math.max(prev - 1, 40));
-  // };
+  const handleTempoDown = () => {
+    setBpm((prev) => Math.max(prev - 1, 40));
+  };
 
-  // const handleTicksUp = () => {
-  //   setTicks((prev) => Math.min(prev + 1, 12));
-  // };
+  const handleTicksUp = () => {
+    setTicks((prev) => Math.min(prev + 1, 12));
+  };
 
-  // const handleTicksDown = () => {
-  //   setTicks((prev) => Math.max(prev - 1, 1));
-  // };
+  const handleTicksDown = () => {
+    setTicks((prev) => Math.max(prev - 1, 1));
+  };
 
   return (
     <div className={styles.appContainer}>
       <div className={styles.deviceBox}>
         <div className={styles.device} data-testid="device-shell">
-          {/*<div
-            className={`${styles.led} ${isPlaying && currentBeat > 0 ? styles.ledActive : ""}`}
+          <div
+            className={`${styles.led} ${isListening ? styles.ledActive : ""}`}
             data-testid="device-led"
-          />*/}
+          />
 
           <main className={styles.mainContent}>
             <div className={styles.lcd}>
-              {/*<Metronome
-                bpm={bpm}
-                ticks={ticks}
-                isPlaying={isPlaying}
-                currentBeat={currentBeat}
-              />*/}
               <Tuner
                 note={inNote}
                 cents={cents}
@@ -129,15 +125,20 @@ function App() {
                 isListening={isListening}
                 volume={volume}
               />
+              <Metronome
+                bpm={bpm}
+                ticks={ticks}
+                isPlaying={isPlaying}
+                currentBeat={currentBeat}
+              />
             </div>
           </main>
 
           <div className={styles.mainLayout}>
             <div className={styles.leftButtons}>
               <div className={styles.buttonGroup}>
+                <h6>Tuner</h6>
                 <fieldset className={styles.threeStateToggle}>
-                  <legend>Tuner:</legend>
-
                   <div>
                     <input
                       type="radio"
@@ -174,7 +175,8 @@ function App() {
                     <label htmlFor="out">Out</label>
                   </div>
                 </fieldset>
-
+              </div>
+              <div className={styles.buttonGroup}>
                 <label htmlFor="note" className={styles.buttonLabel}>
                   Note
                 </label>
@@ -220,58 +222,43 @@ function App() {
                 </select>
               </div>
             </div>
-            {/*
+
             <div className={styles.rightButtons}>
-              <button
-                className={styles.modeButton}
-                onClick={handleSwitchTool}
-                data-testid="btn-mode"
-              >
-                {activeTool === "metronome" ? "METRO" : "TUNER"}
-              </button>
-              <button
-                className={styles.playPauseButton}
-                onClick={handleTogglePlay}
-                data-testid="btn-play-pause"
-              >
-                {activeTool === "metronome" ? "▶/⏸" : "---"}
-              </button>
               <div className={styles.buttonGroup}>
+                <h6>Metronome</h6>
                 <button
-                  className={styles.arrowButton}
-                  onClick={handleTempoUp}
-                  data-testid="btn-tempo-up"
+                  className={styles.playPauseButton}
+                  onClick={handleTogglePlayMetronome}
+                  id="play-pause"
                 >
+                  {isPlaying ? "⏸" : "▶"}
+                </button>
+              </div>
+              <div className={styles.buttonGroup}>
+                <button className={styles.arrowButton} onClick={handleTempoUp}>
                   ▲
                 </button>
                 <div className={styles.buttonLabel}>TEMPO</div>
                 <button
                   className={styles.arrowButton}
                   onClick={handleTempoDown}
-                  data-testid="btn-tempo-down"
                 >
                   ▼
                 </button>
               </div>
               <div className={styles.buttonGroup}>
-                <button
-                  className={styles.arrowButton}
-                  onClick={handleTicksUp}
-                  data-testid="btn-ticks-up"
-                >
+                <button className={styles.arrowButton} onClick={handleTicksUp}>
                   ▲
                 </button>
-                <div className={styles.buttonLabel}>J=</div>
+                <div className={styles.buttonLabel}>TICKS</div>
                 <button
                   className={styles.arrowButton}
                   onClick={handleTicksDown}
-                  data-testid="btn-ticks-down"
                 >
                   ▼
                 </button>
               </div>
             </div>
-            */}
           </div>
         </div>
 

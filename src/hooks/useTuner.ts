@@ -2,7 +2,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useAudio } from "../context/useAudio";
 import { getNoteFromFrequency, type Note } from "./tuner";
 
-export { getNoteFromFrequency, type Note } from "./tuner";
+export {
+  getNoteFromFrequency,
+  type Note,
+  NOTES,
+  notesToFrequency,
+} from "./tuner";
 
 interface TunerResult {
   frequency?: number;
@@ -102,7 +107,7 @@ export const useTunerOut = (frequency: number) => {
   };
 };
 
-export const useTunerIn = ({ transpose }: { transpose: Note }) => {
+export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
   const { audioContext, resume } = useAudio();
   const [result, setResult] = useState<TunerResult>({});
   const [isListening, setIsListening] = useState(false);
@@ -138,7 +143,7 @@ export const useTunerIn = ({ transpose }: { transpose: Note }) => {
       if (frequency > 20 && frequency < 2000) {
         const { note, cents, octave } = getNoteFromFrequency(
           frequency,
-          transpose,
+          targetMidiNote,
         );
         setResult({ frequency, note, cents, octave, volume: maxVal });
       } else {
@@ -151,7 +156,7 @@ export const useTunerIn = ({ transpose }: { transpose: Note }) => {
     animationFrameRef.current = requestAnimationFrame(() =>
       updateRef.current?.(),
     );
-  }, [audioContext, transpose]);
+  }, [audioContext, targetMidiNote]);
 
   useEffect(() => {
     updateRef.current = update;
