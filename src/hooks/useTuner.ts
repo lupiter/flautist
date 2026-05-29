@@ -1,39 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAudio } from "../context/useAudio";
+import { getNoteFromFrequency, type Note } from "./tuner";
 
-export type Note =
-  | "C"
-  | "C♯"
-  | "D"
-  | "E♭"
-  | "E"
-  | "F"
-  | "F♯"
-  | "G"
-  | "G♯"
-  | "A"
-  | "B♭"
-  | "B";
-export const NOTES: Note[] = [
-  "C",
-  "C♯",
-  "D",
-  "E♭",
-  "E",
-  "F",
-  "F♯",
-  "G",
-  "G♯",
-  "A",
-  "B♭",
-  "B",
-];
+export { getNoteFromFrequency, type Note } from "./tuner";
 
 interface TunerResult {
   frequency?: number;
   note?: Note;
   cents?: number;
   octave?: number;
+  volume?: number;
 }
 
 export const useTunerOut = (frequency: number) => {
@@ -135,17 +111,9 @@ export const useTunerIn = ({ transpose }: { transpose: Note }) => {
   const animationFrameRef = useRef<number | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
-  const update = useCallback(() => {
-    const getNoteFromFrequency = (frequency: number) => {
-      const transposeIndex = NOTES.indexOf(transpose);
-      const noteNum = 12 * Math.log2(frequency / 440) + 69;
-      const roundedNote = Math.round(noteNum);
-      const cents = Math.floor((noteNum - roundedNote) * 100);
-      const noteName = NOTES[(roundedNote + transposeIndex) % 12];
-      const octave = Math.floor((roundedNote + transposeIndex) / 12) - 1;
-      return { note: noteName, octave: octave, cents };
-    };
+  const updateRef = useRef<(() => void) | undefined>(undefined);
 
+  const update = useCallback(() => {
     if (!analyserRef.current || !audioContext) return;
 
     const bufferLength = analyserRef.current.frequencyBinCount;
@@ -163,22 +131,31 @@ export const useTunerIn = ({ transpose }: { transpose: Note }) => {
     }
 
     // Only process if the signal is strong enough
-    if (maxVal > 200) {
+    if (maxVal > 50) {
       const nyquist = audioContext.sampleRate / 2;
       const frequency = (maxIndex * nyquist) / bufferLength;
 
       if (frequency > 20 && frequency < 2000) {
-        const { note, cents, octave } = getNoteFromFrequency(frequency);
-        setResult({ frequency, note, cents, octave });
+        const { note, cents, octave } = getNoteFromFrequency(
+          frequency,
+          transpose,
+        );
+        setResult({ frequency, note, cents, octave, volume: maxVal });
       } else {
-        setResult({});
+        setResult({ volume: maxVal });
       }
     } else {
-      setResult({});
+      setResult({ volume: maxVal });
     }
 
-    animationFrameRef.current = requestAnimationFrame(update);
+    animationFrameRef.current = requestAnimationFrame(() =>
+      updateRef.current?.(),
+    );
   }, [audioContext, transpose]);
+
+  useEffect(() => {
+    updateRef.current = update;
+  }, [update]);
 
   const startListening = async () => {
     try {
@@ -194,7 +171,9 @@ export const useTunerIn = ({ transpose }: { transpose: Note }) => {
       analyserRef.current = analyser;
       microphoneRef.current = source;
       setIsListening(true);
-      animationFrameRef.current = requestAnimationFrame(update);
+      animationFrameRef.current = requestAnimationFrame(() =>
+        updateRef.current?.(),
+      );
     } catch (err) {
       console.error("Error accessing microphone:", err);
     }

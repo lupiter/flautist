@@ -1,9 +1,8 @@
-import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock Web Audio API because it's not available in jsdom
 class MockAudioContext {
-  state: 'running' | 'suspended' | 'closed' = 'running';
+  state: 'running' | 'suspended' | 'closed' | 'interrupted' = 'running';
   currentTime = 0;
   onstatechange: (() => void) | null = null;
 
@@ -19,7 +18,7 @@ class MockAudioContext {
 
   createOscillator() {
     return {
-      connect: vi.fn(),
+      connect: vi.fn().mockReturnValue({}),
       start: vi.fn(),
       stop: vi.fn(),
     };
@@ -27,19 +26,24 @@ class MockAudioContext {
 
   createGain() {
     return {
-      connect: vi.fn(),
+      connect: vi.fn().mockReturnValue({}),
       gain: { value: 1 },
     };
   }
 
   createAnalyser() {
     return {
-      connect: vi.fn(),
+      connect: vi.fn().mockReturnValue({}),
       frequencyBinCount: 1024,
       getByteFrequencyData: vi.fn(),
     };
   }
 }
 
-(window as any).AudioContext = MockAudioContext;
-(window as any).webkitAudioContext = MockAudioContext;
+interface CustomWindow extends Window {
+  AudioContext: typeof MockAudioContext;
+  webkitAudioContext: typeof MockAudioContext;
+}
+
+(window as unknown as CustomWindow).AudioContext = MockAudioContext;
+(window as unknown as CustomWindow).webkitAudioContext = MockAudioContext;

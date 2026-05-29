@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useAudio } from '../context/AudioContext';
+import { useAudio } from '../context/useAudio';
 
 interface MetronomeOptions {
   bpm: number;

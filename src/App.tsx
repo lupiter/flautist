@@ -2,22 +2,9 @@ import { useState } from "react";
 import { useAudio } from "./context/useAudio";
 // import Metronome from "./components/Metronome";
 import Tuner from "./components/Tuner";
-import LCD from "./components/LCD";
 // import { useMetronome } from "./hooks/useMetronome";
-import { useTunerIn, useTunerOut, NOTES, type Note } from "./hooks/useTuner";
+import { useTunerIn, useTunerOut, NOTES, type Note, notesToFrequency } from "./hooks/useTuner";
 import styles from "./App.module.css";
-
-const notesToFrequency = (
-  note: Note,
-  octave: number,
-  transpose: Note,
-): number => {
-  const noteIndex = NOTES.indexOf(note);
-  const transposeIndex = NOTES.indexOf(transpose);
-  return (
-    440 * Math.pow(2, (noteIndex + 12 * octave - 49) / 12 + transposeIndex / 12)
-  );
-};
 
 type TunerMode = "off" | "in" | "out";
 
@@ -38,11 +25,7 @@ function App() {
   //   silent: false,
   // });
 
-  const {
-    play: startTuner,
-    stop: stopTuner,
-    isPlaying: isPlayingTuner,
-  } = useTunerOut(pitch);
+  const { play: startTuner, stop: stopTuner } = useTunerOut(pitch);
 
   const {
     isListening,
@@ -51,6 +34,7 @@ function App() {
     note: inNote,
     cents,
     frequency,
+    volume,
   } = useTunerIn({
     transpose,
   });
@@ -123,168 +107,172 @@ function App() {
 
   return (
     <div className={styles.appContainer}>
-      <div className={styles.device} data-testid="device-shell">
-        {/*<div
-          className={`${styles.led} ${isPlaying && currentBeat > 0 ? styles.ledActive : ""}`}
-          data-testid="device-led"
-        />*/}
+      <div className={styles.deviceBox}>
+        <div className={styles.device} data-testid="device-shell">
+          {/*<div
+            className={`${styles.led} ${isPlaying && currentBeat > 0 ? styles.ledActive : ""}`}
+            data-testid="device-led"
+          />*/}
 
-        <main className={styles.mainContent}>
-          <LCD>
-            {/*<Metronome
-                  bpm={bpm}
-                  ticks={ticks}
-                  isPlaying={isPlaying}
-                  currentBeat={currentBeat}
-                />*/}
-            <Tuner
-              note={inNote}
-              cents={cents}
-              frequency={frequency}
-              isListening={isListening}
-            />
-          </LCD>
-        </main>
-
-        <div className={styles.mainLayout}>
-          <div className={styles.leftButtons}>
-            <div className={styles.buttonGroup}>
-              <fieldset className={styles.threeStateToggle}>
-                <legend>Tuner:</legend>
-
-                <div>
-                  <input
-                    type="radio"
-                    id="tunerOff"
-                    name="off"
-                    value="off"
-                    checked={tunerMode === "off"}
-                    onChange={handleTunerModeChange}
-                  />
-                  <label htmlFor="tunerOff">Off</label>
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    id="in"
-                    name="in"
-                    value="in"
-                    checked={tunerMode === "in"}
-                    onChange={handleTunerModeChange}
-                  />
-                  <label htmlFor="in">In</label>
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    id="out"
-                    name="out"
-                    value="out"
-                    checked={tunerMode === "out"}
-                    onChange={handleTunerModeChange}
-                  />
-                  <label htmlFor="out">Out</label>
-                </div>
-              </fieldset>
-
-              <label htmlFor="note" className={styles.buttonLabel}>
-                Note
-              </label>
-              <select
-                className={styles.button}
-                onChange={handleNote}
-                id="note"
-                value={note}
-              >
-                {NOTES.map((note) => (
-                  <option key={note} value={note}>
-                    {note}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="octave" className={styles.buttonLabel}>
-                Octave
-              </label>
-              <select
-                className={styles.button}
-                onChange={handleOctave}
-                id="octave"
-                value={octave}
-              >
-                <option value={6}>6</option>
-                <option value={5}>5</option>
-                <option value={4}>4</option>
-                <option value={3}>3</option>
-              </select>
-              <label htmlFor="transpose" className={styles.buttonLabel}>
-                Transpose
-              </label>
-              <select
-                className={styles.button}
-                onChange={handleTranspose}
-                id="transpose"
-                value={transpose}
-              >
-                <option value="C">C</option>
-                <option value="F">F</option>
-                <option value="B♭">B♭</option>
-                <option value="E♭">E♭</option>
-              </select>
+          <main className={styles.mainContent}>
+            <div className={styles.lcd}>
+              {/*<Metronome
+                bpm={bpm}
+                ticks={ticks}
+                isPlaying={isPlaying}
+                currentBeat={currentBeat}
+              />*/}
+              <Tuner
+                note={inNote}
+                cents={cents}
+                frequency={frequency}
+                isListening={isListening}
+                volume={volume}
+              />
             </div>
+          </main>
+
+          <div className={styles.mainLayout}>
+            <div className={styles.leftButtons}>
+              <div className={styles.buttonGroup}>
+                <fieldset className={styles.threeStateToggle}>
+                  <legend>Tuner:</legend>
+
+                  <div>
+                    <input
+                      type="radio"
+                      id="tunerOff"
+                      name="off"
+                      value="off"
+                      checked={tunerMode === "off"}
+                      onChange={handleTunerModeChange}
+                    />
+                    <label htmlFor="tunerOff">Off</label>
+                  </div>
+
+                  <div>
+                    <input
+                      type="radio"
+                      id="in"
+                      name="in"
+                      value="in"
+                      checked={tunerMode === "in"}
+                      onChange={handleTunerModeChange}
+                    />
+                    <label htmlFor="in">In</label>
+                  </div>
+
+                  <div>
+                    <input
+                      type="radio"
+                      id="out"
+                      name="out"
+                      value="out"
+                      checked={tunerMode === "out"}
+                      onChange={handleTunerModeChange}
+                    />
+                    <label htmlFor="out">Out</label>
+                  </div>
+                </fieldset>
+
+                <label htmlFor="note" className={styles.buttonLabel}>
+                  Note
+                </label>
+                <select
+                  className={styles.button}
+                  onChange={handleNote}
+                  id="note"
+                  value={note}
+                >
+                  {NOTES.map((note) => (
+                    <option key={note} value={note}>
+                      {note}
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor="octave" className={styles.buttonLabel}>
+                  Octave
+                </label>
+                <select
+                  className={styles.button}
+                  onChange={handleOctave}
+                  id="octave"
+                  value={octave}
+                >
+                  <option value={6}>6</option>
+                  <option value={5}>5</option>
+                  <option value={4}>4</option>
+                  <option value={3}>3</option>
+                </select>
+                <label htmlFor="transpose" className={styles.buttonLabel}>
+                  Transpose
+                </label>
+                <select
+                  className={styles.button}
+                  onChange={handleTranspose}
+                  id="transpose"
+                  value={transpose}
+                >
+                  <option value="C">C</option>
+                  <option value="F">F</option>
+                  <option value="B♭">B♭</option>
+                  <option value="E♭">E♭</option>
+                </select>
+              </div>
+            </div>
+            {/*
+            <div className={styles.rightButtons}>
+              <button
+                className={styles.modeButton}
+                onClick={handleSwitchTool}
+                data-testid="btn-mode"
+              >
+                {activeTool === "metronome" ? "METRO" : "TUNER"}
+              </button>
+              <button
+                className={styles.playPauseButton}
+                onClick={handleTogglePlay}
+                data-testid="btn-play-pause"
+              >
+                {activeTool === "metronome" ? "▶/⏸" : "---"}
+              </button>
+              <div className={styles.buttonGroup}>
+                <button
+                  className={styles.arrowButton}
+                  onClick={handleTempoUp}
+                  data-testid="btn-tempo-up"
+                >
+                  ▲
+                </button>
+                <div className={styles.buttonLabel}>TEMPO</div>
+                <button
+                  className={styles.arrowButton}
+                  onClick={handleTempoDown}
+                  data-testid="btn-tempo-down"
+                >
+                  ▼
+                </button>
+              </div>
+              <div className={styles.buttonGroup}>
+                <button
+                  className={styles.arrowButton}
+                  onClick={handleTicksUp}
+                  data-testid="btn-ticks-up"
+                >
+                  ▲
+                </button>
+                <div className={styles.buttonLabel}>J=</div>
+                <button
+                  className={styles.arrowButton}
+                  onClick={handleTicksDown}
+                  data-testid="btn-ticks-down"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+            */}
           </div>
-          {/*
-          <div className={styles.rightButtons}>
-            <button
-              className={styles.modeButton}
-              onClick={handleSwitchTool}
-              data-testid="btn-mode"
-            >
-              {activeTool === "metronome" ? "METRO" : "TUNER"}
-            </button>
-            <button
-              className={styles.playPauseButton}
-              onClick={handleTogglePlay}
-              data-testid="btn-play-pause"
-            >
-              {activeTool === "metronome" ? "▶/⏸" : "---"}
-            </button>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.arrowButton}
-                onClick={handleTempoUp}
-                data-testid="btn-tempo-up"
-              >
-                ▲
-              </button>
-              <div className={styles.buttonLabel}>TEMPO</div>
-              <button
-                className={styles.arrowButton}
-                onClick={handleTempoDown}
-                data-testid="btn-tempo-down"
-              >
-                ▼
-              </button>
-            </div>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.arrowButton}
-                onClick={handleTicksUp}
-                data-testid="btn-ticks-up"
-              >
-                ▲
-              </button>
-              <div className={styles.buttonLabel}>J=</div>
-              <button
-                className={styles.arrowButton}
-                onClick={handleTicksDown}
-                data-testid="btn-ticks-down"
-              >
-                ▼
-              </button>
-            </div>
-          </div>*/}
         </div>
 
         {/*<button

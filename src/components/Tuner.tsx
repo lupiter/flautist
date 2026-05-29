@@ -1,5 +1,5 @@
 import React from "react";
-import { type Note } from "../hooks/useTuner";
+import { type Note } from "../hooks/tuner";
 import styles from "./Tuner.module.css";
 
 interface TunerProps {
@@ -7,6 +7,7 @@ interface TunerProps {
   cents?: number;
   frequency?: number;
   isListening: boolean;
+  volume?: number;
 }
 
 const Tuner: React.FC<TunerProps> = ({
@@ -14,6 +15,7 @@ const Tuner: React.FC<TunerProps> = ({
   cents,
   frequency,
   isListening,
+  volume,
 }) => {
   // Centered at 0, range -50 to +50
   // -50 cents -> -90 degrees
@@ -31,6 +33,14 @@ const Tuner: React.FC<TunerProps> = ({
 
       <div className={styles.mainDisplay}>
         <div className={styles.note}>{note || "--"}</div>
+        {isListening && (
+          <div className={styles.volumeMeterContainer}>
+            <div
+              className={styles.volumeMeterBar}
+              style={{ width: `${Math.min(100, (volume || 0) / 2.55)}%` }}
+            />
+          </div>
+        )}
       </div>
 
       <div className={styles.gaugeContainer}>
