@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useAudio } from "../context/useAudio";
 import { getNoteFromFrequency, type Note } from "./tuner";
 
+const MIN_VOLUME_THRESHOLD = 100;
+
 export {
   getNoteFromFrequency,
   type Note,
@@ -115,6 +117,7 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const updateRef = useRef<(() => void) | undefined>(undefined);
 
@@ -136,7 +139,7 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
     }
 
     // Only process if the signal is strong enough
-    if (maxVal > 50) {
+    if (maxVal > MIN_VOLUME_THRESHOLD) {
       const nyquist = audioContext.sampleRate / 2;
       const frequency = (maxIndex * nyquist) / bufferLength;
 
@@ -166,6 +169,7 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
     try {
       await resume();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
       const source = audioContext!.createMediaStreamSource(stream);
       const analyser = audioContext!.createAnalyser();
       analyser.fftSize = 2048;
@@ -190,6 +194,10 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
     }
     if (microphoneRef.current) {
       microphoneRef.current.disconnect();
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
     setIsListening(false);
     setResult({});

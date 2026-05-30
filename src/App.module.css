@@ -193,12 +193,13 @@
   gap: 4px;
 }
 
-.arrowButton {
+.arrowButton,
+select {
   background: #333;
   border: 1px solid #444;
   border-radius: 4px;
   color: #eee;
-  width: 36px;
+  min-width: 36px;
   height: 36px;
   font-size: 1.2rem;
   cursor: pointer;
@@ -216,7 +217,8 @@
   box-shadow: 0 1px 0 #000;
 }
 
-.buttonLabel {
+.buttonLabel,
+label {
   font-size: 0.55rem;
   font-weight: 800;
   color: #aaa;
