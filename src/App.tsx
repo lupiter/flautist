@@ -16,7 +16,6 @@ type TunerMode = "off" | "in" | "out";
 
 function App() {
   const { audioContext, resume, isSuspended } = useAudio();
-  const [metronomeActive, setMetronomeActive] = useState(false);
   const [note, setNote] = useState<Note>("C");
   const [octave, setOctave] = useState(5);
   const [bpm, setBpm] = useState(120);
