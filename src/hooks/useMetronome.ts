@@ -18,6 +18,11 @@ export const useMetronome = (options: MetronomeOptions) => {
   const schedulerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const nextNoteTimeRef = useRef<number>(0);
   const currentBeatRef = useRef<number>(0);
+  const optionsRef = useRef(options);
+
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   const scheduleNote = useCallback((time: number, beat: number) => {
     // Even if silent, we want to update the beat state for the lights
@@ -25,7 +30,7 @@ export const useMetronome = (options: MetronomeOptions) => {
       setCurrentBeat(beat);
     }, (time - audioContext!.currentTime) * 1000);
 
-    if (options.silent || !audioContext) return;
+    if (optionsRef.current.silent || !audioContext) return;
 
     const osc = audioContext.createOscillator();
     const envelope = audioContext.createGain();
@@ -41,18 +46,18 @@ export const useMetronome = (options: MetronomeOptions) => {
 
     osc.start(time);
     osc.stop(time + 0.1);
-  }, [audioContext, options.silent]);
+  }, [audioContext]);
 
   const scheduler = useCallback(() => {
     while (nextNoteTimeRef.current < audioContext!.currentTime + scheduleAheadTime) {
-      const beat = (currentBeatRef.current % options.totalBeats) + 1;
+      const beat = (currentBeatRef.current % optionsRef.current.totalBeats) + 1;
       scheduleNote(nextNoteTimeRef.current, beat);
 
-      const secondsPerBeat = 60.0 / options.bpm;
+      const secondsPerBeat = 60.0 / optionsRef.current.bpm;
       nextNoteTimeRef.current += secondsPerBeat;
       currentBeatRef.current += 1;
     }
-  }, [audioContext, options, scheduleNote]);
+  }, [audioContext, scheduleNote]);
 
   const start = useCallback(async () => {
     if (!audioContext) return;

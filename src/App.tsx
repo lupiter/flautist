@@ -14,6 +14,15 @@ import styles from "./App.module.css";
 
 type TunerMode = "off" | "in" | "out";
 
+const presetTempos: [string, number][] = [
+  ["Largo", 60],
+  ["Andante", 80],
+  ["Moderato", 100],
+  ["Allegro", 120],
+  ["Vivace", 140],
+  ["Presto", 160],
+];
+
 function App() {
   const { audioContext, resume, isSuspended } = useAudio();
   const [note, setNote] = useState<Note>("C");
@@ -49,8 +58,7 @@ function App() {
     console.log("AudioContext state:", audioContext?.state);
   };
 
-  const handleTunerModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value as TunerMode;
+  const updateTunerMode = (value: TunerMode) => {
     setTunerMode(value);
     if (value === "in") {
       startListening();
@@ -62,6 +70,17 @@ function App() {
       stopListening();
       stopTuner();
     }
+  };
+
+  const handleTunerModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value as TunerMode;
+    updateTunerMode(value);
+  };
+
+  const handleTunerModeClick = () => {
+    updateTunerMode(
+      tunerMode === "in" ? "out" : tunerMode === "out" ? "off" : "in",
+    );
   };
 
   const handleTogglePlayMetronome = () => {
@@ -143,6 +162,7 @@ function App() {
                       value="off"
                       checked={tunerMode === "off"}
                       onChange={handleTunerModeChange}
+                      onClick={handleTunerModeClick}
                     />
                     <input
                       type="radio"
@@ -151,6 +171,7 @@ function App() {
                       value="in"
                       checked={tunerMode === "in"}
                       onChange={handleTunerModeChange}
+                      onClick={handleTunerModeClick}
                     />
                     <input
                       type="radio"
@@ -159,6 +180,7 @@ function App() {
                       value="out"
                       checked={tunerMode === "out"}
                       onChange={handleTunerModeChange}
+                      onClick={handleTunerModeClick}
                     />
                   </div>
 
@@ -238,6 +260,11 @@ function App() {
                 >
                   ▼
                 </button>
+              </div>
+              <div className={styles.presets}>
+                {presetTempos.map(([name, tempo]) => (
+                  <button onClick={() => setBpm(tempo)}>{name}</button>
+                ))}
               </div>
               <div className={styles.buttonGroup}>
                 <button className={styles.arrowButton} onClick={handleTicksUp}>
