@@ -32,8 +32,6 @@ function App() {
 
   const { play: startTuner, stop: stopTuner } = useTunerOut(pitch);
 
-  const targetMidiNote = 12 * Math.log2(pitch / 440) + 69;
-
   const {
     isListening,
     startListening,
@@ -43,7 +41,7 @@ function App() {
     frequency,
     volume,
   } = useTunerIn({
-    targetMidiNote,
+    transposeNote: transpose,
   });
 
   const handleStartAudio = async () => {
@@ -121,7 +119,6 @@ function App() {
                 note={inNote}
                 cents={cents}
                 frequency={frequency}
-                isListening={isListening}
                 volume={volume}
               />
               <Metronome
@@ -138,7 +135,7 @@ function App() {
               <div className={styles.buttonGroup}>
                 <h6>Tuner</h6>
                 <fieldset className={styles.threeStateToggle}>
-                  <div>
+                  <div className={styles.threeStateButton}>
                     <input
                       type="radio"
                       id="tunerOff"
@@ -147,10 +144,6 @@ function App() {
                       checked={tunerMode === "off"}
                       onChange={handleTunerModeChange}
                     />
-                    <label htmlFor="tunerOff">Off</label>
-                  </div>
-
-                  <div>
                     <input
                       type="radio"
                       id="in"
@@ -159,10 +152,6 @@ function App() {
                       checked={tunerMode === "in"}
                       onChange={handleTunerModeChange}
                     />
-                    <label htmlFor="in">In</label>
-                  </div>
-
-                  <div>
                     <input
                       type="radio"
                       id="out"
@@ -171,6 +160,11 @@ function App() {
                       checked={tunerMode === "out"}
                       onChange={handleTunerModeChange}
                     />
+                  </div>
+
+                  <div className={styles.threeStateLabels}>
+                    <label htmlFor="tunerOff">Off</label>
+                    <label htmlFor="in">In</label>
                     <label htmlFor="out">Out</label>
                   </div>
                 </fieldset>

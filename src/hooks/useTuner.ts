@@ -109,7 +109,7 @@ export const useTunerOut = (frequency: number) => {
   };
 };
 
-export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
+export const useTunerIn = ({ transposeNote }: { transposeNote: Note }) => {
   const { audioContext, resume } = useAudio();
   const [result, setResult] = useState<TunerResult>({});
   const [isListening, setIsListening] = useState(false);
@@ -146,7 +146,7 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
       if (frequency > 20 && frequency < 2000) {
         const { note, cents, octave } = getNoteFromFrequency(
           frequency,
-          targetMidiNote,
+          transposeNote,
         );
         setResult({ frequency, note, cents, octave, volume: maxVal });
       } else {
@@ -159,7 +159,7 @@ export const useTunerIn = ({ targetMidiNote }: { targetMidiNote: number }) => {
     animationFrameRef.current = requestAnimationFrame(() =>
       updateRef.current?.(),
     );
-  }, [audioContext, targetMidiNote]);
+  }, [audioContext, transposeNote]);
 
   useEffect(() => {
     updateRef.current = update;

@@ -6,36 +6,25 @@ interface TunerProps {
   note?: Note;
   cents?: number;
   frequency?: number;
-  isListening: boolean;
   volume?: number;
 }
 
-const Tuner: React.FC<TunerProps> = ({
-  note,
-  cents,
-  frequency,
-  isListening,
-  volume,
-}) => {
+const Tuner: React.FC<TunerProps> = ({ note, cents, frequency, volume }) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.modeLabel}>
-          Tuner {isListening ? "• Listening" : ""}
-        </div>
+        <div className={styles.modeLabel}>Tuner</div>
         <div className={styles.pitchLabel}>{frequency} Hz</div>
       </div>
 
       <div className={styles.mainDisplay}>
         <div className={styles.note}>{note || "--"}</div>
-        {isListening && (
-          <div className={styles.volumeMeterContainer}>
-            <div
-              className={styles.volumeMeterBar}
-              style={{ width: `${Math.min(100, (volume || 0) / 2.55)}%` }}
-            />
-          </div>
-        )}
+        <div className={styles.volumeMeterContainer}>
+          <div
+            className={styles.volumeMeterBar}
+            style={{ width: `${Math.min(100, (volume || 0) / 2.55)}%` }}
+          />
+        </div>
       </div>
 
       <div className={styles.gaugeContainer}>

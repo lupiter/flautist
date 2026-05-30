@@ -41,6 +41,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 1;
+  min-height: 90px;
 }
 
 .gaugeContainer {

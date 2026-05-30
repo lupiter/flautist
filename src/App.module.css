@@ -116,9 +116,9 @@
 }
 
 .deviceBox {
-  margin: 15px auto;
+  margin: 5px auto;
   border-radius: 40px;
-  width: calc(100% - 30px);
+  width: calc(100% - 10px);
 }
 
 .device::before {
@@ -137,7 +137,7 @@
 }
 
 .device {
-  padding: 30px;
+  padding: 20px;
   margin: 8px;
   border-radius: 34px;
   width: calc(100% - 16px);
@@ -146,6 +146,7 @@
 .led {
   width: 12px;
   height: 12px;
+  margin-bottom: 10px;
   border-radius: 50%;
   background: #111;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
@@ -162,10 +163,71 @@
 .mainLayout {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: start;
   justify-content: space-around;
   gap: 20px;
   width: 100%;
+}
+
+h6 {
+  margin: 1rem;
+}
+
+.threeStateToggle {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  gap: 10px;
+  border: 0;
+}
+
+.threeStateToggle .threeStateButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  box-shadow: 0 -2px 0 #000;
+  background: #000;
+  border: 1px solid #444;
+  border-radius: 4px;
+  width: calc(44px * 2 * 20px);
+  height: 44px;
+}
+
+.threeStateToggle .threeStateLabels {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  color: #eee;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.threeStateToggle .threeStateButton input:checked {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  background: #333;
+  border: 1px solid #444;
+  box-shadow:
+    0 2px 2px #000,
+    inset 0 0 20px rgba(0, 0, 0, 0.4);
+  appearance: none;
+  border-radius: 4px;
+  margin: 1px;
+  padding: 0;
+}
+
+.threeStateToggle .threeStateButton input {
+  appearance: none;
+  width: 20px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
 }
 
 .leftButtons,
@@ -206,7 +268,10 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 0 #000;
+  padding: 0 4px;
+  box-shadow:
+    0 4px 2px #000,
+    inset 0 0 20px rgba(0, 0, 0, 0.4);
   transition:
     transform 0.05s,
     box-shadow 0.05s;
@@ -227,20 +292,6 @@ label {
 }
 
 .modeButton {
-  background: #333;
-  border: 1px solid #444;
-  border-radius: 4px;
-  color: #eee;
-  width: 44px;
-  height: 44px;
-  font-size: 0.6rem;
-  font-weight: 800;
-  cursor: pointer;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 0 #000;
 }
 
 .modeButton:active {
