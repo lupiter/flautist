@@ -25,11 +25,12 @@ const Metronome: React.FC<MetronomeProps> = ({
         <div className={styles.bpm}>{bpm}</div>
       </div>
 
-      <div className={styles.lightsContainer} data-testid="lights-container">
+      <div className={styles.lightsContainer} role="group" aria-label="metronome lights">
         {Array.from({ length: ticks }).map((_, i) => (
           <div
             key={i}
-            data-testid="metronome-light"
+            role="img"
+            aria-label="metronome light"
             className={`${styles.light} ${
               isPlaying && currentBeat === i + 1 ? styles.lightActive : ""
             }`}

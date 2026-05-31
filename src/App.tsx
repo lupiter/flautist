@@ -31,7 +31,7 @@ function App() {
   const [ticks, setTicks] = useState(4);
   const [transpose, setTranspose] = useState<Note>("C");
   const pitch = notesToFrequency(note, octave, transpose);
-  const [tunerMode, setTunerMode] = useState("off");
+  const [tunerMode, setTunerMode] = useState<TunerMode>("off");
 
   const { isPlaying, start, stop, currentBeat } = useMetronome({
     bpm,
@@ -126,10 +126,11 @@ function App() {
   return (
     <div className={styles.appContainer}>
       <div className={styles.deviceBox}>
-        <div className={styles.device} data-testid="device-shell">
+        <div className={styles.device}>
           <div
             className={`${styles.led} ${isListening ? styles.ledActive : ""}`}
-            data-testid="device-led"
+            role="status"
+            aria-label="device led"
           />
 
           <main className={styles.mainContent}>
@@ -245,35 +246,38 @@ function App() {
                   className={styles.playPauseButton}
                   onClick={handleTogglePlayMetronome}
                   id="play-pause"
+                  aria-label={isPlaying ? "pause" : "play"}
                 >
                   {isPlaying ? "⏸" : "▶"}
                 </button>
               </div>
               <div className={styles.buttonGroup}>
-                <button className={styles.arrowButton} onClick={handleTempoUp}>
+                <button className={styles.arrowButton} onClick={handleTempoUp} aria-label="increase tempo">
                   ▲
                 </button>
                 <div className={styles.buttonLabel}>TEMPO</div>
                 <button
                   className={styles.arrowButton}
                   onClick={handleTempoDown}
+                  aria-label="decrease tempo"
                 >
                   ▼
                 </button>
               </div>
               <div className={styles.presets}>
                 {presetTempos.map(([name, tempo]) => (
-                  <button onClick={() => setBpm(tempo)}>{name}</button>
+                  <button key={name} onClick={() => setBpm(tempo)}>{name}</button>
                 ))}
               </div>
               <div className={styles.buttonGroup}>
-                <button className={styles.arrowButton} onClick={handleTicksUp}>
+                <button className={styles.arrowButton} onClick={handleTicksUp} aria-label="increase ticks">
                   ▲
                 </button>
                 <div className={styles.buttonLabel}>TICKS</div>
                 <button
                   className={styles.arrowButton}
                   onClick={handleTicksDown}
+                  aria-label="decrease ticks"
                 >
                   ▼
                 </button>
@@ -285,7 +289,6 @@ function App() {
         {/*<button
           className={styles.tapButton}
           onClick={handleTap}
-          data-testid="btn-tap"
         >
           TAP
         </button>*/}

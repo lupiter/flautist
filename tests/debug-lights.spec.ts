@@ -3,12 +3,12 @@ import { test, expect } from '@playwright/test';
 test('debug: metronome lights existence and style', async ({ page }) => {
   await page.goto('http://localhost:5173');
 
-  // Find the lights container
-  const lightsContainer = page.getByTestId('lights-container');
+  // Find the lights container using accessibility role
+  const lightsContainer = page.getByRole('group', { name: 'metronome lights' });
   await expect(lightsContainer).toBeVisible();
 
   // Check if there are any lights
-  const lights = page.getByTestId('metronome-light');
+  const lights = page.getByRole('img', { name: 'metronome light' });
   const count = await lights.count();
   console.log('Number of lights found:', count);
 
