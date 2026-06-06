@@ -11,17 +11,17 @@ test('tm70t: user interaction and visual check', async ({ page }) => {
   await expect(page.getByText('120')).toBeVisible();
 
   // 2. Switch to Tuner mode
-  // Find the button in the Tuner group by its heading
-  const modeButton = page.getByRole('heading', { name: 'Tuner' }).locator('..').getByRole('button');
-  await modeButton.click();
+  // Validate the heading and radio buttons are visible separately
+  await expect(page.getByRole('heading', { name: 'Tuner' })).toBeVisible();
+  const tunerRadio = page.getByRole('radio', { name: 'In' });
+  await expect(tunerRadio).toBeVisible();
+  await tunerRadio.click();
 
   // Check if Tuner content is visible (via text)
   await expect(page.getByRole('heading', { name: 'Tuner' })).toBeVisible();
 
   // 3. Switch back to Metronome (Off mode)
-  // Current is IN. Click once -> OUT. Click again -> OFF.
-  await modeButton.click();
-  await modeButton.click();
+  await page.getByRole('radio', { name: 'Off' }).click();
 
   await expect(page.getByText('120')).toBeVisible();
 
